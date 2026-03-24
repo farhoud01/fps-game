@@ -6,13 +6,15 @@ extends CharacterBody3D
 var can_slide : bool = true
 @export var slide_cooldown : float = 1.25# 1 second cooldown
 @export var free_look_tilt_amount : float = 8
+@export var air_lerp_speed : float = 0.3 
 var colray 
 var direction = Vector3.ZERO
 var current_speed : float = 5.0
-
+var lastvel = Vector3.ZERO
 @export var sprint_speed : float = 8.0
 @onready var eyes: Node3D = $neck/head/eyes
 @onready var cam: Camera3D = $neck/head/eyes/Camera3D
+@onready var animation_player: AnimationPlayer = $neck/AnimationPlayer
 
 const walk_speed = 5.0
 const crouch_speed :float = 3.0
@@ -70,6 +72,7 @@ func _input(event):
 		head.rotate_x(deg_to_rad(-event.relative.y * mouse_sens))
 		head.rotation.x = clamp(head.rotation.x, deg_to_rad(-89), deg_to_rad(90))
 func _physics_process(delta: float) -> void:
+	handle_landing()
 	_handle_speed(delta)
 	# Add the gravity.
 	if not is_on_floor():
@@ -80,6 +83,7 @@ func _physics_process(delta: float) -> void:
 	# Handle jump.
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_vel
+		animation_player.play("jump")
 		if current_state == state.sliding : 
 			var jump_direction = (transform.basis * Vector3(slide_vector.x, 0, slide_vector.y)).normalized()
 			velocity.x = jump_direction.x * slide_speed
@@ -91,7 +95,12 @@ func _physics_process(delta: float) -> void:
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir = Input.get_vector("left", "right", "forward", "down")
-	direction = lerp(direction,(transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized(),delta*lerp_speed)
+	if is_on_floor():
+		direction = lerp(direction,(transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized(),delta*lerp_speed)
+	else : 
+		if input_dir != Vector2.ZERO :
+			direction = lerp(direction,(transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized(),delta*air_lerp_speed)
+		
 	if current_state == state.sliding : 
 		direction  = (transform.basis * Vector3(slide_vector.x ,0 , slide_vector.y)).normalized()
 		current_speed = (slide_timer +0.1)  * slide_speed
@@ -106,8 +115,9 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0, current_speed)
 		velocity.z = move_toward(velocity.z, 0, current_speed)
 	handle_slide(input_dir,delta)
+	lastvel = velocity
 	move_and_slide()
-
+	
 func _process(delta: float) -> void:
 	handle_headbobbing(delta,Input.get_vector("left", "right", "forward", "down"))
 	handle_free_looking(delta)
@@ -151,13 +161,13 @@ func handle_free_looking (d):
 	if Input.is_action_pressed("free_look") or current_state == state.sliding  : 
 		free_looking = true 
 		if current_state == state.sliding : 
-			cam.rotation.z = lerp(cam.rotation.z,-deg_to_rad(7.0),d)
+			eyes.rotation.z = lerp(eyes.rotation.z,-deg_to_rad(7.0),d)
 		else : 
-			cam.rotation.z = -deg_to_rad(neck.rotation.y * free_look_tilt_amount)
+			eyes.rotation.z = -deg_to_rad(neck.rotation.y * free_look_tilt_amount)
 	else : 
 		free_looking=false 
 		neck.rotation.y = lerp(neck.rotation.y , 0.0 , d * lerp_speed)
-		cam.rotation.z = lerp(cam.rotation.z , 0.0 , d * lerp_speed)
+		eyes.rotation.z = lerp(eyes.rotation.z , 0.0 , d * lerp_speed)
 func handle_slide(dir,delta) : 
 	if not is_on_floor()  : return 
 	if Input.is_action_pressed("sprint") && can_slide && dir != Vector2.ZERO && current_state != state.sliding  && current_state != state.crouching: 
@@ -203,3 +213,7 @@ func handle_headbobbing(delta, input_dir) :
 	else : 
 		eyes.position.y = lerp(eyes.position.y ,0.0 , lerp_speed*delta)
 		eyes.position.x = lerp(eyes.position.x , 0.0, lerp_speed*delta)
+func handle_landing () : 
+	if is_on_floor() : 
+		if lastvel.y < 0.0:
+			animation_player.play("landing")
