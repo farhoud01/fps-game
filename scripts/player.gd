@@ -15,6 +15,8 @@ var lastvel = Vector3.ZERO
 @onready var eyes: Node3D = $neck/head/eyes
 @onready var cam: Camera3D = $neck/head/eyes/Camera3D
 @onready var animation_player: AnimationPlayer = $neck/AnimationPlayer
+#wall jump rays 
+var back_ray
 var front_ray 
 var wall_jump_pushing = false
 const walk_speed = 5.0
@@ -61,6 +63,7 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	crouching_collision_shape.disabled = true 
 	init_col_ray() 
+	init_walljump_rays()
 	free_looking = false
 func _input(event):
 	if event is InputEventMouseMotion : 
@@ -136,6 +139,8 @@ func init_col_ray() :
 	add_child(colray)
 	colray.enabled = true 
 	colray.target_position = Vector3(0,2.1,0)
+	
+func init_walljump_rays () : 
 	front_ray = RayCast3D.new()
 	add_child(front_ray)
 	front_ray.add_exception(self)
@@ -143,7 +148,13 @@ func init_col_ray() :
 	front_ray.position = Vector3.ZERO
 	front_ray.collision_mask = 2
 	front_ray.target_position = Vector3(0,0.6,-1)
-
+	back_ray = RayCast3D.new()
+	add_child(back_ray)
+	back_ray.add_exception(self)
+	back_ray.enabled = true 
+	back_ray.position = Vector3.ZERO
+	back_ray.collision_mask = 2
+	back_ray.target_position = Vector3(0,0.6,1)
 func handle_crouching(d) : 
 	if not is_on_floor() : return 
 	if current_state == state.sliding: 
@@ -229,8 +240,8 @@ func handle_landing () :
 			animation_player.play("landing")
 
 func handle_walljumping (delta) :
-	if front_ray.is_colliding() and !is_on_floor() : 
-		if Input.is_action_just_pressed("jump") : 
+	if front_ray.is_colliding()  : 
+		if Input.is_action_just_pressed("jump") and !is_on_floor() : 
 			var wall_normal = front_ray.get_collision_normal()
 			direction = Vector3.ZERO 
 			velocity = Vector3.ZERO
@@ -242,4 +253,16 @@ func handle_walljumping (delta) :
 			wall_jump_pushing = true
 			await get_tree().create_timer(0.2).timeout
 			wall_jump_pushing = false 
-		
+	elif back_ray.is_colliding() : 
+		if Input.is_action_just_pressed("jump") and !is_on_floor() : 
+			var wall_normal = front_ray.get_collision_normal()
+			direction = Vector3.ZERO 
+			velocity = Vector3.ZERO
+			velocity.y = wall_jump_vel
+			animation_player.play("jump")
+			velocity.x = wall_normal.x * 4.0
+			velocity.z =  -wall_normal.z *4.5
+			
+			wall_jump_pushing = true
+			await get_tree().create_timer(0.2).timeout
+			wall_jump_pushing = false 
