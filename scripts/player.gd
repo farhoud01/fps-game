@@ -15,7 +15,8 @@ var lastvel = Vector3.ZERO
 @onready var eyes: Node3D = $neck/head/eyes
 @onready var cam: Camera3D = $neck/head/eyes/Camera3D
 @onready var animation_player: AnimationPlayer = $neck/AnimationPlayer
-
+var front_ray 
+var wall_jump_pushing = false
 const walk_speed = 5.0
 const crouch_speed :float = 3.0
 const jump_vel = 4.5
@@ -28,7 +29,7 @@ var slide_timer_max = 1.0
 var slide_vector = Vector2.ZERO
 var slide_speed = 10.0
 # states
-
+var wall_jump_vel = 3
 enum state {walking,sprinting, crouching , sliding}
 var free_looking : bool = false 
 
@@ -52,7 +53,7 @@ func _handle_speed(delta) :
 	elif current_state != state.crouching : 
 		current_speed = lerp(current_speed,walk_speed,lerp_speed*delta ) ;
 		current_state = state.walking
-	print(state.keys()[current_state])
+	
 	
 	
 	
@@ -74,6 +75,7 @@ func _input(event):
 func _physics_process(delta: float) -> void:
 	handle_landing()
 	_handle_speed(delta)
+	handle_walljumping(delta)
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
@@ -104,25 +106,23 @@ func _physics_process(delta: float) -> void:
 	if current_state == state.sliding : 
 		direction  = (transform.basis * Vector3(slide_vector.x ,0 , slide_vector.y)).normalized()
 		current_speed = (slide_timer +0.1)  * slide_speed
-	if direction:
-		velocity.x = direction.x * current_speed
-		velocity.z = direction.z * current_speed
-		
-		 
-		
-	
-	else:
-		velocity.x = move_toward(velocity.x, 0, current_speed)
-		velocity.z = move_toward(velocity.z, 0, current_speed)
+	if not wall_jump_pushing : 
+		if direction:
+			velocity.x = direction.x * current_speed
+			velocity.z = direction.z * current_speed
+		else:
+			velocity.x = move_toward(velocity.x, 0, current_speed)
+			velocity.z = move_toward(velocity.z, 0, current_speed)
 	handle_slide(input_dir,delta)
 	lastvel = velocity
 	move_and_slide()
 	
 func _process(delta: float) -> void:
 	handle_headbobbing(delta,Input.get_vector("left", "right", "forward", "down"))
+	
 	handle_free_looking(delta)
 	reset_col_on_air(delta)
-	print(free_looking)
+
 
 	handle_crouching(delta)
 func head_hit_celling():
@@ -136,6 +136,14 @@ func init_col_ray() :
 	add_child(colray)
 	colray.enabled = true 
 	colray.target_position = Vector3(0,2.1,0)
+	front_ray = RayCast3D.new()
+	add_child(front_ray)
+	front_ray.add_exception(self)
+	front_ray.enabled = true 
+	front_ray.position = Vector3.ZERO
+	front_ray.collision_mask = 2
+	front_ray.target_position = Vector3(0,0.6,-1)
+
 func handle_crouching(d) : 
 	if not is_on_floor() : return 
 	if current_state == state.sliding: 
@@ -174,7 +182,7 @@ func handle_slide(dir,delta) :
 		if  Input.is_action_just_pressed("slide"):
 			current_state =state.sliding 
 			slide_timer = slide_timer_max
-			print("sliding start ")
+		
 			slide_vector = dir
 			
 	if current_state == state.sliding  : 
@@ -183,13 +191,13 @@ func handle_slide(dir,delta) :
 		if slide_timer <= 0 : 
 			current_state = state.crouching
 			free_looking = false
-			print("sliding end ")
+		
 			start_slide_cooldown()
 func start_slide_cooldown():
 	can_slide = false
 	await get_tree().create_timer(slide_cooldown).timeout
 	can_slide = true
-	print("can slide again")
+	
 func reset_col_on_air(delta):
 	if not is_on_floor() : 
 		standing_collision_shape.disabled = false
@@ -215,5 +223,23 @@ func handle_headbobbing(delta, input_dir) :
 		eyes.position.x = lerp(eyes.position.x , 0.0, lerp_speed*delta)
 func handle_landing () : 
 	if is_on_floor() : 
-		if lastvel.y < 0.0:
+		if lastvel.y < -10.0:
+			animation_player.play("rolling")
+		elif lastvel.y < -4.0 : 
 			animation_player.play("landing")
+
+func handle_walljumping (delta) :
+	if front_ray.is_colliding() and !is_on_floor() : 
+		if Input.is_action_just_pressed("jump") : 
+			var wall_normal = front_ray.get_collision_normal()
+			direction = Vector3.ZERO 
+			velocity = Vector3.ZERO
+			velocity.y = wall_jump_vel
+			animation_player.play("jump")
+			velocity.x = wall_normal.x * 4.0
+			velocity.z =  wall_normal.z *4.5
+			
+			wall_jump_pushing = true
+			await get_tree().create_timer(0.2).timeout
+			wall_jump_pushing = false 
+		
