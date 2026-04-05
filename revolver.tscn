@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bi4mhpu1e0t0k"]
+
+[ext_resource type="Material" uid="uid://dq24m1q8t1uq1" path="res://new_standard_material_3d.tres" id="1_ftnpd"]
+[ext_resource type="Script" uid="uid://cupv2rlqegcmw" path="res://weapons/gun system/revolver.gd" id="2_3v8vv"]
+[ext_resource type="Resource" uid="uid://b81njh2bjaeui" path="res://weapons/gun system/revolver.tres" id="2_ftnpd"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_3v8vv"]
+
+[node name="revolver" type="Node3D" unique_id=2147159708]
+transform = Transform3D(1.2333632, 0, 0, 0, 0.22854012, 0, 0, 0, 0.26480633, 0, 0, 0)
+script = ExtResource("2_3v8vv")
+weapon_data = ExtResource("2_ftnpd")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1028041057]
+material_overlay = ExtResource("1_ftnpd")
+mesh = SubResource("BoxMesh_3v8vv")

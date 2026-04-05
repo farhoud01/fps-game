@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Weapon_data" format=3 uid="uid://b81njh2bjaeui"]
+
+[ext_resource type="Script" uid="uid://g6mym5j1bj7c" path="res://weapons/weapons.gd" id="1_lc0go"]
+
+[resource]
+script = ExtResource("1_lc0go")
+damage = 13
+weapon_name = "revolver"
+weapon_position = Vector3(0, -0.278, -0.622)
+current_ammo = 8

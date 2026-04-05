@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dh8v5xxhtw5wy"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_aq1o4"]
+
+[node name="pistolmodel" type="MeshInstance3D" unique_id=631671208]
+transform = Transform3D(4.9367298e-08, 5.1226964e-16, -0.17773545, 9.8734596e-08, -0.13405389, 0, -1.1293921, -1.1719363e-08, -7.769064e-09, 0, 0, 0)
+mesh = SubResource("BoxMesh_aq1o4")

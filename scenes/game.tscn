@@ -3,6 +3,9 @@
 [ext_resource type="Texture2D" uid="uid://d1yuvmydu4krx" path="res://assets/hdris/kloofendal_48d_partly_cloudy_puresky_2k.hdr" id="1_uwrxv"]
 [ext_resource type="Texture2D" uid="uid://ca2el0i4a8xf0" path="res://assets/textures/dev/grids/Dark/texture_07.png" id="1_yqjtg"]
 [ext_resource type="Script" uid="uid://ca185521el2kr" path="res://scripts/player.gd" id="2_lnu2h"]
+[ext_resource type="Script" uid="uid://diodj10l6i4ta" path="res://weapons/weapon_controller.gd" id="3_lbhrr"]
+[ext_resource type="PackedScene" uid="uid://dbl62anhef1qu" path="res://pistol.tscn" id="4_p57ef"]
+[ext_resource type="PackedScene" uid="uid://bi4mhpu1e0t0k" path="res://revolver.tscn" id="5_u5sy4"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lnu2h"]
 albedo_texture = ExtResource("1_yqjtg")
@@ -161,12 +164,34 @@ size = Vector3(20, 1, 20)
 material = SubResource("StandardMaterial3D_lnu2h")
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="stage" unique_id=1656923697]
-transform = Transform3D(1, 0, 0, 0, 0.9999913, 0.004171325, 0, -0.004171325, 0.9999913, 0.297, 2.885941, -10.416882)
+transform = Transform3D(0.9999934, -0.0003648875, -0.0036240837, 0.00040391373, 0.99994195, 0.010772048, 0.0036199419, -0.01077344, 0.9999354, 0.297, 2.885941, -22.913557)
+use_collision = true
+size = Vector3(20, 1, 4.003418)
+material = SubResource("StandardMaterial3D_lnu2h")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="stage" unique_id=1829370125]
+transform = Transform3D(0.9999934, -0.0003648875, -0.0036240837, 0.00040391373, 0.99994195, 0.010772048, 0.0036199419, -0.01077344, 0.9999354, 0.297, 2.885941, -10.416882)
 use_collision = true
 size = Vector3(20, 1, 4.003418)
 material = SubResource("StandardMaterial3D_lnu2h")
 
 [node name="CSGBox3D4" type="CSGBox3D" parent="stage" unique_id=1446055593]
+transform = Transform3D(-4.2305124e-16, 4.3711385e-08, -1, -0.9521719, -0.3055624, -1.3356552e-08, -0.3055624, 0.9521719, 4.162076e-08, -4.475587, 6.6668577, -12.926434)
+use_collision = true
+collision_layer = 3
+collision_mask = 2
+size = Vector3(6.209072, 0.9790039, 4.3933105)
+material = SubResource("StandardMaterial3D_lnu2h")
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="stage" unique_id=997793142]
+transform = Transform3D(-4.2305124e-16, 4.3711385e-08, -1, -0.9521719, -0.3055624, -1.3356552e-08, -0.3055624, 0.9521719, 4.162076e-08, -4.475587, 6.093116, -16.823322)
+use_collision = true
+collision_layer = 3
+collision_mask = 2
+size = Vector3(5.00395, 0.9790039, 4.3933105)
+material = SubResource("StandardMaterial3D_lnu2h")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="stage" unique_id=182116228]
 transform = Transform3D(1.9106855e-15, 4.371139e-08, -1, 1, -4.371139e-08, 0, -4.371139e-08, -1, -4.371139e-08, -3.5910683, 3.2635412, -4.801375)
 use_collision = true
 collision_layer = 3
@@ -198,7 +223,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 
 [node name="head" type="Node3D" parent="stage/player/neck" unique_id=1346559713]
 
-[node name="eyes" type="Node3D" parent="stage/player/neck/head" unique_id=1335255151]
+[node name="eyes" type="Node3D" parent="stage/player/neck/head" unique_id=1335255151 node_paths=PackedStringArray("weapon_container")]
+script = ExtResource("3_lbhrr")
+weapon_scenes = Array[PackedScene]([ExtResource("4_p57ef"), ExtResource("5_u5sy4")])
+weapon_container = NodePath("Camera3D")
 
 [node name="Camera3D" type="Camera3D" parent="stage/player/neck/head/eyes" unique_id=1189991324]
 
@@ -212,5 +240,5 @@ environment = SubResource("Environment_lbhrr")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="env" unique_id=486997482]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-light_energy = 1.158
+light_energy = 1.475
 shadow_enabled = true

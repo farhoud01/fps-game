@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://dbl62anhef1qu"]
+
+[ext_resource type="Script" uid="uid://bl28v8fns22wy" path="res://pistol.gd" id="1_08c3m"]
+[ext_resource type="Resource" uid="uid://i8ulb52q8ls6" path="res://weapons/gun system/pistol.tres" id="2_bttkv"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_bttkv"]
+
+[node name="pistol" type="Node3D" unique_id=288080541]
+transform = Transform3D(1, 0, 0, 0, 0.19999999, 0, 0, 0, 0.19999999, 0, 0, 0)
+script = ExtResource("1_08c3m")
+weapon_data = ExtResource("2_bttkv")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1546314395]
+mesh = SubResource("BoxMesh_bttkv")
