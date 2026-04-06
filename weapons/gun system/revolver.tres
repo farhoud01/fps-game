@@ -8,3 +8,5 @@ damage = 13
 weapon_name = "revolver"
 weapon_position = Vector3(0, -0.278, -0.622)
 current_ammo = 8
+raycast_type = true
+range = 100.0

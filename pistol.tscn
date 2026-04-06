@@ -6,7 +6,7 @@
 [sub_resource type="BoxMesh" id="BoxMesh_bttkv"]
 
 [node name="pistol" type="Node3D" unique_id=288080541]
-transform = Transform3D(1, 0, 0, 0, 0.19999999, 0, 0, 0, 0.19999999, 0, 0, 0)
+transform = Transform3D(-4.371139e-08, 0, 0.19999999, 0, 0.19999999, 0, -1, 0, -8.742277e-09, 0, 0, 0)
 script = ExtResource("1_08c3m")
 weapon_data = ExtResource("2_bttkv")
 

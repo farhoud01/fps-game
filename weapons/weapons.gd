@@ -8,3 +8,6 @@ class_name Weapon_data extends Resource
 @export var weapon_name : String = "pistol"
 @export var weapon_position : Vector3 = Vector3(0.2,-0.2,0.3)
 @export var current_ammo:int
+@export var raycast_type :bool
+@export var range:float 
+@export var recoil_amount:Vector3
