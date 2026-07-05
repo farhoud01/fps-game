@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_lc0go")
-damage = 13
+damage = 30
 weapon_name = "revolver"
 weapon_position = Vector3(0, -0.278, -0.622)
 current_ammo = 8

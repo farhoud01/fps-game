@@ -49,3 +49,7 @@ func swap_weapon(index) :
 	new_gun.process_mode = Node.PROCESS_MODE_INHERIT
 	current_weapon_node = new_gun
 	
+
+
+func _on_target_test_damage_taken(amount: int) -> void:
+	pass # Replace with function body.

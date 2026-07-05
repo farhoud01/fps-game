@@ -5,6 +5,7 @@ class_name WeaponBase extends Node3D
 var current_ammo : int
 var current_reserve : int
 var is_reloading : bool = false
+
 var ray_hit : RayCast3D 
 var cam : Camera3D
 func _ready() -> void:
@@ -48,6 +49,10 @@ func shoot():
 			if ray_hit.is_colliding() :
 				var target = ray_hit.get_collider()
 				print("hitted , " + target.name)
+				if (target.get_parent().has_method("take_dmg")) : 
+					target.get_parent().take_dmg(weapon_data.damage)
+			
+				
 			else : 
 				print("ray hit nothing ")
 			
